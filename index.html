@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GLEAMO Lucky Pick</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: one centered column for the player, a wider two-zone grid for the admin. Black / ivory / gold from the GLEAMO brief. */
+:root {
+  --bg: #faf8f4;
+  --surface: #ffffff;
+  --ink: #111111;
+  --muted: #6b665c;
+  --line: #e7e2d6;
+  --gold: #b8923a;
+  --gold-soft: #e6c979;
+  --gold-deep: #8c6b22;
+  --card-top: #2a2a2a;
+  --card-bottom: #111111;
+  --on-dark: #e6c979;
+  --good-bg: #e3f3e6;
+  --good-fg: #1f6b35;
+  --warn-bg: #fbefd2;
+  --warn-fg: #7a5a12;
+  --bad-bg: #fbe4e1;
+  --bad-fg: #a3281b;
+  --shadow: 0 10px 30px -14px rgba(17, 17, 17, 0.3);
+  --glow: rgba(184, 146, 58, 0.55);
+  --font: "Cairo", system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e0d0b; --surface: #181613; --ink: #f4efe4; --muted: #a29b8a; --line: #2e2a22;
+    --gold: #d1a94a; --gold-soft: #ecd28a; --gold-deep: #e6c979;
+    --card-top: #2c2923; --card-bottom: #14120f; --on-dark: #e6c979;
+    --good-bg: #17301e; --good-fg: #8fd6a2; --warn-bg: #3a2e10; --warn-fg: #ecd28a; --bad-bg: #3b1a16; --bad-fg: #f1a79d;
+    --shadow: 0 10px 30px -14px rgba(0, 0, 0, 0.7); --glow: rgba(209, 169, 74, 0.6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e0d0b; --surface: #181613; --ink: #f4efe4; --muted: #a29b8a; --line: #2e2a22;
+  --gold: #d1a94a; --gold-soft: #ecd28a; --gold-deep: #e6c979;
+  --card-top: #2c2923; --card-bottom: #14120f; --on-dark: #e6c979;
+  --good-bg: #17301e; --good-fg: #8fd6a2; --warn-bg: #3a2e10; --warn-fg: #ecd28a; --bad-bg: #3b1a16; --bad-fg: #f1a79d;
+  --shadow: 0 10px 30px -14px rgba(0, 0, 0, 0.7); --glow: rgba(209, 169, 74, 0.6);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.6;
+  padding-inline: 16px;
+  padding-block: 0 48px;
+  direction: rtl;
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.demo-note {
+  margin-inline: -16px;
+  padding: 8px 16px;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 13px;
+  text-align: center;
+}
+.demo-note b { color: var(--gold-soft); }
+:root[data-theme="dark"] .demo-note b, :root:not([data-theme="light"]) .demo-note b { color: var(--gold-deep); }
+
+header.top {
+  max-width: 64rem;
+  margin-inline: auto;
+  padding-block: 24px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.brand { font-weight: 800; font-size: 24px; letter-spacing: 0.4em; padding-inline-start: 0.4em; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--surface); }
+.seg button { border: 0; background: transparent; padding: 6px 16px; border-radius: 999px; font-weight: 700; font-size: 14px; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+main { max-width: 64rem; margin-inline: auto; }
+.player { max-width: 28rem; margin-inline: auto; padding-top: 24px; }
+.rule { height: 1px; width: 64px; margin: 8px auto 28px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+
+h1 { font-size: 26px; line-height: 1.35; margin: 0; text-align: center; font-weight: 800; text-wrap: balance; }
+.sub { text-align: center; color: var(--muted); font-size: 14px; margin: 6px 0 0; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 20px; box-shadow: var(--shadow); }
+form.panel { margin-top: 28px; display: grid; gap: 16px; }
+label span { display: block; font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+input {
+  width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--bg); font-size: 16px;
+}
+input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 25%, transparent); }
+input[dir="ltr"] { text-align: right; }
+.err { color: var(--bad-fg); font-size: 14px; font-weight: 700; margin: 0; }
+.btn {
+  width: 100%; border: 0; border-radius: 12px; padding: 13px 16px; font-weight: 800; font-size: 16px;
+  background: var(--ink); color: var(--gold-soft);
+}
+:root[data-theme="dark"] .btn, :root:not([data-theme="light"]) .btn { color: var(--ink); background: var(--gold-soft); }
+.btn:disabled { opacity: 0.6; cursor: default; }
+.btn:active { transform: scale(0.985); }
+
+/* Cards */
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 28px; direction: ltr; }
+.flip { perspective: 900px; aspect-ratio: 3 / 4; border: 0; background: none; padding: 0; transition: opacity 0.5s; }
+.flip[disabled] { cursor: default; }
+.flip.dim { opacity: 0.28; }
+.inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); border-radius: 16px; }
+.flip.flipped .inner { transform: rotateY(180deg); }
+.face { position: absolute; inset: 0; border-radius: 16px; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: grid; place-content: center; text-align: center; }
+.front { background: linear-gradient(180deg, var(--card-top), var(--card-bottom)); box-shadow: 0 0 0 1px var(--gold), var(--shadow); }
+.front .q { font-size: 40px; font-weight: 800; color: var(--on-dark); line-height: 1; }
+.front .n { font-size: 12px; color: var(--gold); font-weight: 700; margin-top: 8px; }
+.back { transform: rotateY(180deg); background: var(--surface); box-shadow: 0 0 0 1px var(--gold), 0 14px 40px -10px var(--glow); font-size: 36px; }
+@keyframes pulse {
+  0%, 100% { transform: translateY(0) scale(1); box-shadow: 0 0 0 1px var(--gold), 0 8px 24px -10px var(--glow); }
+  50% { transform: translateY(-4px) scale(1.03); box-shadow: 0 0 0 1px var(--gold-soft), 0 16px 44px -8px var(--glow); }
+}
+.thinking .inner { animation: pulse 1.1s ease-in-out infinite; }
+.wait { text-align: center; color: var(--gold-deep); font-weight: 700; font-size: 14px; margin-top: 24px; }
+
+.result { text-align: center; margin-top: 8px; }
+.result .big { font-size: 34px; font-weight: 800; margin: 4px 0 0; }
+.result .prize { font-size: 21px; font-weight: 700; color: var(--gold-deep); margin: 14px 0 0; line-height: 1.5; text-wrap: balance; }
+.code-label { margin: 22px 0 6px; font-size: 14px; font-weight: 700; color: var(--muted); }
+.code { direction: ltr; border: 1px dashed var(--gold); border-radius: 14px; padding: 14px; font-size: 30px; font-weight: 800; letter-spacing: 0.18em; background: var(--bg); font-variant-numeric: tabular-nums; }
+.result .btn { margin-top: 14px; }
+.rise { animation: rise 0.5s ease-out both; }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.restart { margin-top: 20px; text-align: center; }
+.link { background: none; border: 0; color: var(--muted); text-decoration: underline; font-size: 14px; padding: 4px; }
+
+/* Admin */
+.admin { padding-top: 16px; direction: ltr; }
+.admin h2 { font-size: 16px; margin: 0 0 12px; font-weight: 800; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
+.stat small { display: block; color: var(--muted); font-size: 12px; font-weight: 700; }
+.stat strong { font-size: 32px; line-height: 1.2; color: var(--gold-deep); font-variant-numeric: tabular-nums; }
+.cols { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px; margin-top: 16px; align-items: start; }
+.inv { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.inv li { display: grid; gap: 6px; }
+.inv .row { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.inv .nm { direction: rtl; font-size: 14px; font-weight: 700; text-align: left; min-width: 0; }
+.inv .qty { font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.inv .qty.zero { color: var(--bad-fg); }
+.bar { height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--gold); border-radius: 99px; transition: width 0.4s; }
+.tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.tabs button { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 5px 14px; font-weight: 700; font-size: 13px; color: var(--muted); }
+.tabs button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 560px; }
+th { text-align: left; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--line); }
+td { padding: 9px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+td.ar { direction: rtl; text-align: left; }
+td.mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-weight: 700; letter-spacing: 0.05em; }
+.pill { border: 0; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 800; }
+.pill.no { background: var(--warn-bg); color: var(--warn-fg); }
+.pill.yes { background: var(--good-bg); color: var(--good-fg); }
+.empty { color: var(--muted); font-size: 14px; padding: 18px 4px; }
+.foot { margin-top: 16px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center; color: var(--muted); font-size: 12px; direction: rtl; }
+
+@media (max-width: 760px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .cols { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .inner { transition-duration: 0.01s; }
+  .thinking .inner, .rise { animation: none; }
+}
+
+html{color-scheme:light dark}body{margin:0}[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="demo-note">نسخة تجريبية للمعاينة: السيرفر هنا وهمي جوه الصفحة. النسخة الحقيقية بتختار الجائزة في <b>قاعدة البيانات</b>.</div>
+
+<header class="top">
+  <div class="brand">GLEAMO</div>
+  <div class="seg" role="group" aria-label="العرض">
+    <button id="tab-game" aria-pressed="true">اللعبة</button>
+    <button id="tab-admin" aria-pressed="false">لوحة الأدمن</button>
+  </div>
+</header>
+
+<main>
+  <!-- ───────── Player ───────── -->
+  <section id="view-game" class="player">
+    <div class="rule"></div>
+
+    <div id="s-form" class="rise">
+      <h1>اختار كارتك... وشوف حظك 🎁</h1>
+      <p class="sub">اختار كارت واحد فقط واكتشف مفاجأتك.</p>
+      <form id="f" class="panel" novalidate>
+        <label for="name"><span>الاسم</span><input id="name" autocomplete="name" maxlength="80"></label>
+        <label for="phone"><span>رقم الموبايل</span><input id="phone" dir="ltr" inputmode="tel" placeholder="01XXXXXXXXX" autocomplete="tel"></label>
+        <p id="ferr" class="err" hidden></p>
+        <button class="btn" id="go">ابدأ</button>
+      </form>
+    </div>
+
+    <div id="s-cards" hidden>
+      <h1>اختار كارتك... وشوف حظك 🎁</h1>
+      <p class="sub">اختار كارت واحد فقط واكتشف مفاجأتك.</p>
+      <div class="grid" id="grid"></div>
+      <p class="wait" id="wait" hidden>بنكشف مفاجأتك...</p>
+    </div>
+
+    <div id="s-result" class="panel result rise" hidden></div>
+
+    <div id="s-already" class="panel result rise" hidden>
+      <h1>أنت شاركت بالفعل ❤️</h1>
+      <p class="sub" style="font-size:16px;margin-top:10px">كل شخص لديه محاولة واحدة فقط في المسابقة.</p>
+      <p class="sub" style="margin-top:14px">لقد شاركت بالفعل في المسابقة.<br>نتمنى لك حظًا سعيدًا دائمًا ❤️</p>
+    </div>
+
+    <div id="s-closed" class="panel result rise" hidden>
+      <h1>المسابقة انتهت</h1>
+      <p class="sub" style="font-size:16px;margin-top:10px">شكرًا لاهتمامك، ونتمنى نشوفك في المسابقات الجاية ❤️</p>
+    </div>
+
+    <div class="restart" id="restart" hidden>
+      <button class="link" id="again">تجربة مشارك جديد (للمعاينة فقط)</button>
+    </div>
+  </section>
+
+  <!-- ───────── Admin ───────── -->
+  <section id="view-admin" class="admin" hidden>
+    <div class="stats" id="stats"></div>
+    <div class="cols">
+      <div class="panel">
+        <h2>Prize Inventory</h2>
+        <ul class="inv" id="inv"></ul>
+      </div>
+      <div class="panel">
+        <div class="tabs">
+          <button id="t-win" aria-pressed="true">Winners</button>
+          <button id="t-par" aria-pressed="false">Participants</button>
+        </div>
+        <div class="scroll" id="tbl"></div>
+      </div>
+    </div>
+    <div class="foot">
+      <span>الأرقام بتتحدث تلقائيًا بعد كل لعبة. الدخول الحقيقي بـ Supabase Auth.</span>
+      <button class="link" id="reset">تصفير البيانات التجريبية</button>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ── Fake "server": same rules as the real database function (play_game) ── */
+const SEED = [
+  { name: "علبة GLEAMO هدية", qty: 3, win: true },
+  { name: "شحن مجاني داخل القاهرة", qty: 20, win: true },
+  { name: "خصم 25% + مصاريف الشحن", qty: 30, win: true },
+  { name: "علبة GLEAMO + علبة هدية + مصاريف الشحن", qty: 10, win: true },
+  { name: "حظ موفق", qty: 150, win: false },
+];
+let prizes, people, attempts, codes;
+function resetServer() {
+  prizes = SEED.map((p) => ({ name: p.name, initial: p.qty, remaining: p.qty, win: p.win }));
+  people = new Map();   // phone -> { name, phone, date }
+  attempts = new Map(); // phone -> { prize, code, date, redeemed }
+  codes = new Set();
+}
+resetServer();
+
+function normalizePhone(input) {
+  const AR = "٠١٢٣٤٥٦٧٨٩", FA = "۰۱۲۳۴۵۶۷۸۹";
+  const d = String(input || "")
+    .replace(/[٠-٩]/g, (c) => AR.indexOf(c))
+    .replace(/[۰-۹]/g, (c) => FA.indexOf(c))
+    .replace(/\D/g, "");
+  let n;
+  if (d.startsWith("0020")) n = d.slice(4);
+  else if (d.startsWith("200") && d.length === 13) n = d.slice(3);
+  else if (d.startsWith("20") && d.length === 12) n = d.slice(2);
+  else if (d.startsWith("0") && d.length === 11) n = d.slice(1);
+  else n = d;
+  return /^1[0125]\d{8}$/.test(n) ? "0" + n : null;
+}
+function secureInt(max) {
+  const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % max;
+}
+function newCode() {
+  const A = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let c;
+  do { c = "GLM-" + Array.from({ length: 6 }, () => A[secureInt(32)]).join(""); } while (codes.has(c));
+  codes.add(c); return c;
+}
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function apiRegister(name, phoneRaw) {
+  await wait(250);
+  const phone = normalizePhone(phoneRaw);
+  if (!name || name.trim().length < 2) return { status: "invalid_name" };
+  if (!phone) return { status: "invalid_phone" };
+  if (!people.has(phone)) people.set(phone, { name: name.trim(), phone, date: new Date() });
+  return { status: attempts.has(phone) ? "already_played" : "ok" };
+}
+async function apiPlay(name, phoneRaw) {
+  await wait(400);
+  const phone = normalizePhone(phoneRaw);
+  if (!phone) return { status: "invalid_phone" };
+  if (!people.has(phone)) people.set(phone, { name: name.trim(), phone, date: new Date() });
+  if (attempts.has(phone)) return { status: "already_played" };
+  const total = prizes.reduce((s, p) => s + p.remaining, 0);
+  if (total === 0) return { status: "closed" };
+  let roll = secureInt(total), chosen;          // chance = remaining / total
+  for (const p of prizes) { if (roll < p.remaining) { chosen = p; break; } roll -= p.remaining; }
+  chosen.remaining -= 1;
+  const code = chosen.win ? newCode() : null;
+  attempts.set(phone, { prize: chosen, code, date: new Date(), redeemed: false });
+  return { status: "ok", prize: { name: chosen.name, isWin: chosen.win }, code };
+}
+
+/* ── Player UI ── */
+const $ = (id) => document.getElementById(id);
+const screens = ["s-form", "s-cards", "s-result", "s-already", "s-closed"];
+function show(id) {
+  screens.forEach((s) => ($(s).hidden = s !== id));
+  $("restart").hidden = id === "s-form" || id === "s-cards";
+}
+let cur = { name: "", phone: "" }, locked = false;
+
+$("f").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const err = $("ferr"); err.hidden = true;
+  $("go").disabled = true; $("go").textContent = "لحظة...";
+  const r = await apiRegister($("name").value, $("phone").value);
+  $("go").disabled = false; $("go").textContent = "ابدأ";
+  if (r.status === "ok") { cur = { name: $("name").value, phone: $("phone").value }; buildCards(); show("s-cards"); }
+  else if (r.status === "already_played") show("s-already");
+  else {
+    err.textContent = r.status === "invalid_name" ? "اكتب اسمك من فضلك." : "رقم الموبايل غير صحيح. مثال: 01012345678";
+    err.hidden = false;
+  }
+});
+
+function buildCards() {
+  locked = false; $("wait").hidden = true;
+  $("grid").innerHTML = [1, 2, 3, 4, 5, 6].map((n) =>
+    `<button class="flip" data-n="${n}" aria-label="كارت ${n}">
+       <div class="inner">
+         <div class="face front"><span class="q">?</span><span class="n">${n}</span></div>
+         <div class="face back"></div>
+       </div></button>`).join("");
+  $("grid").querySelectorAll(".flip").forEach((b) => b.addEventListener("click", () => pick(b)));
+}
+
+async function pick(btn) {
+  if (locked) return; locked = true;
+  const all = [...$("grid").children];
+  all.forEach((b) => { b.disabled = true; if (b !== btn) b.classList.add("dim"); });
+  btn.classList.add("thinking"); $("wait").hidden = false;
+  const [res] = await Promise.all([apiPlay(cur.name, cur.phone), wait(1400)]); // result only after the "server" answers
+  if (res.status === "already_played") return show("s-already");
+  if (res.status === "closed") return show("s-closed");
+  btn.classList.remove("thinking");
+  btn.querySelector(".back").textContent = res.prize.isWin ? "🎁" : "❤️";
+  btn.classList.add("flipped"); $("wait").hidden = true;
+  setTimeout(() => { renderResult(res); show("s-result"); }, 1200);
+}
+
+function renderResult(res) {
+  const box = $("s-result");
+  if (res.prize.isWin) {
+    box.innerHTML = `<div style="font-size:40px">🎉</div><p class="big">مبروك 🎉</p>
+      <p class="prize">${res.prize.name}</p>
+      <p class="code-label">كود الجائزة:</p><div class="code">${res.code}</div>
+      <button class="btn" id="copy">نسخ الكود</button>`;
+    $("copy").addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(res.code); $("copy").textContent = "تم النسخ ✓"; }
+      catch { const r = document.createRange(); r.selectNodeContents(box.querySelector(".code")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); $("copy").textContent = "اضغط نسخ على الكود المحدد"; }
+    });
+  } else {
+    box.innerHTML = `<div style="font-size:40px">❤️</div><p class="big">حظ أوفر ❤️</p>
+      <p class="sub" style="font-size:16px;margin-top:10px">نتمنى نشوفك معانا في المرة الجاية.</p>`;
+  }
+}
+
+$("again").addEventListener("click", () => { $("name").value = ""; $("phone").value = ""; show("s-form"); });
+
+/* ── Admin UI ── */
+let adminTab = "win";
+const fmt = (d) => d.toLocaleString("ar-EG", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Cairo" });
+
+function renderAdmin() {
+  const winners = [...attempts.entries()].filter(([, a]) => a.prize.win);
+  const left = prizes.filter((p) => p.win).reduce((s, p) => s + p.remaining, 0);
+  const tiles = [
+    ["Total Participants", people.size], ["Total Winners", winners.length],
+    ["Remaining Prizes", left], ["Redeemed Prizes", winners.filter(([, a]) => a.redeemed).length],
+  ];
+  $("stats").innerHTML = tiles.map(([l, v]) => `<div class="stat"><small>${l}</small><strong>${v}</strong></div>`).join("");
+  $("inv").innerHTML = prizes.map((p) => `<li><div class="row"><span class="qty ${p.remaining === 0 ? "zero" : ""}">${p.remaining} / ${p.initial}</span><span class="nm">${p.name}</span></div>
+    <div class="bar"><i style="width:${(p.remaining / p.initial) * 100}%"></i></div></li>`).join("");
+  $("t-win").textContent = `Winners (${winners.length})`;
+  $("t-par").textContent = `Participants (${people.size})`;
+  $("t-win").setAttribute("aria-pressed", adminTab === "win");
+  $("t-par").setAttribute("aria-pressed", adminTab === "par");
+
+  if (adminTab === "win") {
+    $("tbl").innerHTML = winners.length ? `<table><thead><tr><th>Name</th><th>Phone</th><th>Prize</th><th>Prize Code</th><th>Date</th><th>Status</th></tr></thead><tbody>` +
+      winners.slice().reverse().map(([ph, a]) => `<tr><td>${esc(people.get(ph).name)}</td><td>${ph}</td><td class="ar">${a.prize.name}</td><td class="mono">${a.code}</td><td>${fmt(a.date)}</td>
+        <td><button class="pill ${a.redeemed ? "yes" : "no"}" data-ph="${ph}">${a.redeemed ? "Redeemed" : "Not Redeemed"}</button></td></tr>`).join("") + `</tbody></table>`
+      : `<p class="empty">No winners yet. Play a round from the player view and the winner appears here.</p>`;
+    $("tbl").querySelectorAll("[data-ph]").forEach((b) => b.addEventListener("click", () => {
+      const a = attempts.get(b.dataset.ph); a.redeemed = !a.redeemed; renderAdmin();
+    }));
+  } else {
+    $("tbl").innerHTML = people.size ? `<table style="min-width:420px"><thead><tr><th>Name</th><th>Phone</th><th>Date</th><th>Played</th></tr></thead><tbody>` +
+      [...people.values()].reverse().map((p) => `<tr><td>${esc(p.name)}</td><td>${p.phone}</td><td>${fmt(p.date)}</td><td>${attempts.has(p.phone) ? "Yes" : "No"}</td></tr>`).join("") + `</tbody></table>`
+      : `<p class="empty">No participants yet.</p>`;
+  }
+}
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+$("t-win").addEventListener("click", () => { adminTab = "win"; renderAdmin(); });
+$("t-par").addEventListener("click", () => { adminTab = "par"; renderAdmin(); });
+$("reset").addEventListener("click", () => { resetServer(); renderAdmin(); });
+
+function setView(v) {
+  $("view-game").hidden = v !== "game"; $("view-admin").hidden = v !== "admin";
+  $("tab-game").setAttribute("aria-pressed", v === "game"); $("tab-admin").setAttribute("aria-pressed", v === "admin");
+  if (v === "admin") renderAdmin();
+}
+$("tab-game").addEventListener("click", () => setView("game"));
+$("tab-admin").addEventListener("click", () => setView("admin"));
+</script>
+
+</body>
+</html>
